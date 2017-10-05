@@ -14,9 +14,6 @@ namespace supportbank
             string textFromFile = System.IO.File.ReadAllText(path);
             Console.WriteLine(textFromFile);
 
-            Console.Write("Who do you want to search for?");
-            Console.ReadLine();
-
             List<Person> employees = new List<Person>();
             
             string[] lines = System.IO.File.ReadAllLines(path);
