@@ -14,6 +14,7 @@ namespace supportbank
             string textFromFile = System.IO.File.ReadAllText(path);
             Console.WriteLine(textFromFile);
 
+            List<Transaction> transactions = new List<Transaction>();
             List<Person> employees = new List<Person>();
             
             string[] lines = System.IO.File.ReadAllLines(path);
@@ -23,29 +24,35 @@ namespace supportbank
                 string date = line[0];
                 string from = line[1];
                 string to = line[2];
+                string narrative = line[3];
                 decimal amount = decimal.Parse(line[4]);
+
+                var transaction = new Transaction { date = date, to = to, amount = amount, narrative = narrative, from = from };
 
                 if (!employees.Any(worker => worker.name == from))
                 {
                     Person fromPerson = new Person { name = from, balance = -amount };
                     employees.Add(fromPerson);
+                    fromPerson.transactions.Add(transaction);
                 }
                 else
                 {
                     Person fromPerson = employees.First(worker => worker.name == from);
                     fromPerson.balance = fromPerson.balance - amount;
+                    fromPerson.transactions.Add(transaction);
                 }
 
                 if (!employees.Any(worker => worker.name == to))
                 {
                     Person toPerson = new Person { name = to, balance = amount };
                     employees.Add(toPerson);
+                    toPerson.transactions.Add(transaction);
                 }
                 else
                 {
                     Person toPerson = employees.First(worker => worker.name == to);
                     toPerson.balance = toPerson.balance + amount;
-
+                    toPerson.transactions.Add(transaction);
                 }
             }
 
@@ -55,9 +62,18 @@ namespace supportbank
                 Console.WriteLine(worker.balance);
             }
 
-            Console.WriteLine("Amount of employees: {0}", employees.Count);
+            Console.WriteLine("Input employee");
+            var userInput = Console.ReadLine();
+            foreach (Person worker in employees)
+            {
+                if (userInput.ToLower() == worker.name.ToLower())
+                {
+                    foreach (Transaction transaction in worker.transactions)
+                        Console.WriteLine(transaction.date + " " + transaction.from + " " + transaction.to + " " + transaction.narrative + "   " + transaction.amount);
+                }
+                
+            }
             Console.ReadLine();
-
 
         }
     }
@@ -66,7 +82,17 @@ namespace supportbank
     {
         public string name;
         public decimal balance;
+        public List<Transaction> transactions = new List<Transaction>();
+        
+    }
 
+    class Transaction
+    {
+        public string to;
+        public string from;
+        public string date;
+        public string narrative;
+        public decimal amount;
     }
 }
 
