@@ -1,4 +1,7 @@
-﻿using System;
+﻿using NLog;
+using NLog.Config;
+using NLog.Targets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +11,25 @@ namespace supportbank
 {
     class Program
     {
+        private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
+
         public static void Main(string[] args)
         {
+            var config = new LoggingConfiguration();
+            var target = new FileTarget { FileName = @"C:\Work\Logs\SupportBank.log", Layout = @"${longdate} ${level} - ${logger}: ${message}" };
+            config.AddTarget("File Logger", target);
+            config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, target));
+            LogManager.Configuration = config;
+            logger.Log(LogLevel.Info, "Program starting");
+
+
             string path = @"C:\Users\Rich\test\supportproject\Transactions2014.csv";
             string textFromFile = System.IO.File.ReadAllText(path);
             Console.WriteLine(textFromFile);
+
+            string path2 = @"C: \Users\Rich\Downloads\dodgy transactions.txt";
+            string textFromFile2 = System.IO.File.ReadAllText(path2);
+            Console.WriteLine(textFromFile2);
 
             List<Transaction> transactions = new List<Transaction>();
             List<Person> employees = new List<Person>();
@@ -93,6 +110,11 @@ namespace supportbank
         public string date;
         public string narrative;
         public decimal amount;
+    }
+
+    class ValidationResult
+    {
+        public string Validationresult;
     }
 }
 
