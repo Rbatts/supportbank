@@ -15,6 +15,7 @@ namespace supportbank
 
         public static void Main(string[] args)
         {
+            
             var config = new LoggingConfiguration();
             var target = new FileTarget { FileName = @"C:\Work\Logs\SupportBank.log", Layout = @"${longdate} ${level} - ${logger}: ${message}" };
             config.AddTarget("File Logger", target);
@@ -22,54 +23,62 @@ namespace supportbank
             LogManager.Configuration = config;
             logger.Log(LogLevel.Info, "Program starting");
 
-
             string path = @"C:\Users\Rich\test\supportproject\Transactions2014.csv";
             string textFromFile = System.IO.File.ReadAllText(path);
-            Console.WriteLine(textFromFile);
 
-            string path2 = @"C: \Users\Rich\Downloads\dodgy transactions.txt";
+            string path2 = @"C: \Users\Rich\Downloads\dodgy transactions.csv";
             string textFromFile2 = System.IO.File.ReadAllText(path2);
-            Console.WriteLine(textFromFile2);
-
             List<Transaction> transactions = new List<Transaction>();
             List<Person> employees = new List<Person>();
+            logger.Log(LogLevel.Info, "Files uploaded");
             
-            string[] lines = System.IO.File.ReadAllLines(path);
+            string[] lines = System.IO.File.ReadAllLines(path2);
             for (int i = 1; i < lines.Length; i = i + 1)
             {
-                string[] line = lines[i].Split(',');
-                string date = line[0];
-                string from = line[1];
-                string to = line[2];
-                string narrative = line[3];
-                decimal amount = decimal.Parse(line[4]);
+                try
+                {
 
-                var transaction = new Transaction { date = date, to = to, amount = amount, narrative = narrative, from = from };
+                    string[] line = lines[i].Split(',');
+                    string date = line[0];
+                    string from = line[1];
+                    string to = line[2];
+                    string narrative = line[3];
+                    decimal amount = decimal.Parse(line[4]);
 
-                if (!employees.Any(worker => worker.name == from))
-                {
-                    Person fromPerson = new Person { name = from, balance = -amount };
-                    employees.Add(fromPerson);
-                    fromPerson.transactions.Add(transaction);
-                }
-                else
-                {
-                    Person fromPerson = employees.First(worker => worker.name == from);
-                    fromPerson.balance = fromPerson.balance - amount;
-                    fromPerson.transactions.Add(transaction);
-                }
 
-                if (!employees.Any(worker => worker.name == to))
-                {
-                    Person toPerson = new Person { name = to, balance = amount };
-                    employees.Add(toPerson);
-                    toPerson.transactions.Add(transaction);
+                    var transaction = new Transaction { date = date, to = to, amount = amount, narrative = narrative, from = from };
+
+                    if (!employees.Any(worker => worker.name == from))
+                    {
+                        Person fromPerson = new Person { name = from, balance = -amount };
+                        employees.Add(fromPerson);
+                        fromPerson.transactions.Add(transaction);
+                    }
+                    else
+                    {
+                        Person fromPerson = employees.First(worker => worker.name == from);
+                        fromPerson.balance = fromPerson.balance - amount;
+                        fromPerson.transactions.Add(transaction);
+                    }
+
+                    if (!employees.Any(worker => worker.name == to))
+                    {
+                        Person toPerson = new Person { name = to, balance = amount };
+                        employees.Add(toPerson);
+                        toPerson.transactions.Add(transaction);
+                    }
+                    else
+                    {
+                        Person toPerson = employees.First(worker => worker.name == to);
+                        toPerson.balance = toPerson.balance + amount;
+                        toPerson.transactions.Add(transaction);
+                    }
                 }
-                else
+                catch
                 {
-                    Person toPerson = employees.First(worker => worker.name == to);
-                    toPerson.balance = toPerson.balance + amount;
-                    toPerson.transactions.Add(transaction);
+                    logger.Log(LogLevel.Error, "Error with a line of data file");
+                    logger.Log(LogLevel.Error, lines[i]);
+                    Console.WriteLine("Error detected. Please check the log file");
                 }
             }
 
@@ -112,9 +121,4 @@ namespace supportbank
         public decimal amount;
     }
 
-    class ValidationResult
-    {
-        public string Validationresult;
-    }
 }
-
