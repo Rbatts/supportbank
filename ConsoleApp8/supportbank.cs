@@ -15,7 +15,7 @@ namespace supportbank
 
         public static void Main(string[] args)
         {
-            
+
             var config = new LoggingConfiguration();
             var target = new FileTarget { FileName = @"C:\Work\Logs\SupportBank.log", Layout = @"${longdate} ${level} - ${logger}: ${message}" };
             config.AddTarget("File Logger", target);
@@ -25,13 +25,17 @@ namespace supportbank
 
             string path = @"C:\Users\Rich\test\supportproject\Transactions2014.csv";
             string textFromFile = System.IO.File.ReadAllText(path);
+            logger.Log(LogLevel.Info, "2014 transaction Files uploaded");
 
             string path2 = @"C: \Users\Rich\Downloads\dodgy transactions.csv";
             string textFromFile2 = System.IO.File.ReadAllText(path2);
+            logger.Log(LogLevel.Info, "Dodgy Files uploaded");
+
+            string path3 = @"C: \Users\Rich\Downloads\Transactions2013.json";
+            string textFromFile3 = System.IO.File.ReadAllText(path3);
             List<Transaction> transactions = new List<Transaction>();
             List<Person> employees = new List<Person>();
-            logger.Log(LogLevel.Info, "Files uploaded");
-            
+
             string[] lines = System.IO.File.ReadAllLines(path2);
             for (int i = 1; i < lines.Length; i = i + 1)
             {
@@ -97,28 +101,28 @@ namespace supportbank
                     foreach (Transaction transaction in worker.transactions)
                         Console.WriteLine(transaction.date + " " + transaction.from + " " + transaction.to + " " + transaction.narrative + "   " + transaction.amount);
                 }
-                
+
             }
             Console.ReadLine();
 
         }
     }
+}
 
     class Person
     {
-        public string name;
-        public decimal balance;
-        public List<Transaction> transactions = new List<Transaction>();
-        
+    public string name;
+    public decimal balance;
+    public List<Transaction> transactions = new List<Transaction>();
+
     }
 
-    class Transaction
-    {
-        public string to;
-        public string from;
-        public string date;
-        public string narrative;
-        public decimal amount;
-    }
-
+class Transaction
+{
+    public string to;
+    public string from;
+    public string date;
+    public string narrative;
+    public decimal amount;
 }
+
